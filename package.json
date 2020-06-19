@@ -1,0 +1,32 @@
+{
+  "name": "wumpi-rewrite",
+  "version": "0.0.1",
+  "description": "The goal of this bot is to provide a full suite of moderation commands and functions. The bot not only will be available to make a moderators life easier, but automate as much as it can. This extends to new member scans and anti bot players. It also allows for automating the muting of spammers, swearing, racial slurs, and raiding. This will improve the overall security of your server. It also includes a backup function which will keep a 24/7 backup of your server.",
+  "main": "src/wumpi.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/wumpi.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Edqe14/Wumpi-rewrite.git"
+  },
+  "keywords": [
+    "Management"
+  ],
+  "author": "Edqe_",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/Edqe14/Wumpi-rewrite/issues"
+  },
+  "homepage": "https://github.com/Edqe14/Wumpi-rewrite#readme",
+  "dependencies": {
+    "@discordjs/collection": "^0.1.5",
+    "canvas": "^2.6.1",
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.19",
+    "ms": "^2.1.2"
+  }
+}
