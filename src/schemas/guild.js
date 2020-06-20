@@ -14,6 +14,8 @@ module.exports = mongoose.model('guild', new mongoose.Schema({
         },
         moderation: {
             filteredWords: Array,
+            whitelistDefaultWords: Array,
+            useCustomFilter: Boolean,
             punishments: Array,
             history: Map
         },

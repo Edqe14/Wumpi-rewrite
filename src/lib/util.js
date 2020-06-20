@@ -18,8 +18,9 @@ class Util extends DiscordUtil {
         const config = client.config = require('../config.json');
         client.Util = Util;
         client.Server = new Server(client);
-        client.Filter = new Filter();
-        client.setMaxListeners(10000)
+        client.setMaxListeners(10000);
+        Util.Filter = new Filter();
+        Util.BadWords = Util.Filter.list;
 
         const commands = client.commands = new Collection();
         readdir(__dirname+"/../handlers/commands/", (e, f) => {
@@ -48,7 +49,7 @@ class Util extends DiscordUtil {
             });
             client.setMaxListeners(10000);
         });
-    };
+    }
 
     static sleep(ms) {
         return new Promise((res) => setTimeout(res, ms));
@@ -73,6 +74,8 @@ class Util extends DiscordUtil {
                 },
                 moderation: {
                     filteredWords: [],
+                    whitelistDefaultWords: [],
+                    useCustomFilter: false,
                     reason: "AutoMod | %s",
                     punishments: [
                         { action: "WARN", max: 3 },

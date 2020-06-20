@@ -26,6 +26,10 @@ MONGODB=<mongoDBconnectionURI>
 
 4. Run `npm start` or `node .` to run the bot
 
+## Notes
+
+1. Badword Filter already came with default values (Mostly included popular English swear/badwords). [Word List](https://github.com/web-mech/badwords/blob/master/lib/lang.json) [Package](https://www.npmjs.com/package/bad-words)
+
 ## Contributing
 
 1. Fork this repository
