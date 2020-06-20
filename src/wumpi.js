@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 mongoose.connect(process.env.MONGODB, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-});
+}).catch(e => { if(e) throw e; }).then(() => console.log('Connected to MongoDB'));
 
 const { Client } = require('discord.js');
 const { initiate } = require('./lib/util.js');

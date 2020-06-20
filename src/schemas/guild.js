@@ -1,35 +1,54 @@
 const mongoose = require('mongoose');
 
-module.exports = mongoose.model('guildSettings', new mongoose.Schema({
+module.exports = mongoose.model('guild', new mongoose.Schema({
     id: String,
     name: String,
-    mutes: Map,
-    variables: {
-        prefix: String,
-        timezone: String,
-        supportRoleID: String,
-        ticketGreetingMessage: String,
-        ticketMaxTicketCount: Number,
-        filtered_words: Array
+    prefix: String,
+    features: {
+        support: {
+            supportRole: String,
+            ticketGreetingMessage: String,
+            ticketMaxTicketCount: Number,
+            ticketCategory: String,
+            ticketLogChannel: String
+        },
+        moderation: {
+            filteredWords: Array,
+            punishments: Array,
+            history: Map
+        },
+        greeting: {
+            welcomeChannel: String,
+            welcomeMessage: String,
+            goodbyeChannel: String,
+            goodbyeMessage: String
+        },
+        maintenance: {
+            maintenanceCategory: String,
+            overwrites: Map
+        },
+        imageOnlyChannels: Array,
+        textOnlyChannels: Array,
+        disabled: Map
     },
-    values: {
-        isAutoSlowdownEnabled: Boolean,
-        isAutoModEnabled: Boolean,
-        isAntiBotEnabled: Boolean,
-        isBackUpEnabled: Boolean,
-        isActionLogEnabled: Boolean,
-        isMusicEnabled: Boolean,
-        isInviteTrackerEnabled: Boolean,
-        isSupportTicketsEnabled: Boolean
-    },
-    channels: {
-        overwrites: Map,
-        maintenanceCategoryID: String,
-        ticketCategoryID: String,
-        ticketLogChannelID: String,
-        welcomeChannelID: String,
-        imageOnlyChannelIDs: Array,
-        botOnlyChannelIDs: Array,
-        userOnlyChannelIDs: Array
+    toggle: {
+        backup: Boolean,
+        channel: {
+            imageOnly: Boolean,
+            textOnly: Boolean
+        },
+        greeting: {
+            goodbye: Boolean,
+            welcome: Boolean
+        },
+        inviteTracker: Boolean,
+        music: Boolean,
+        moderation: {
+            actionLogs: Boolean,
+            autoSlowdown: Boolean,
+            autoMod: Boolean,
+            verification: Boolean
+        },
+        support: Boolean
     }
 }));
