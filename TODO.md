@@ -20,3 +20,5 @@ module.exports = exports = {
 ```
 
 3. Finish HTTP/HTTPS Request handler (express)
+
+4. Test mute methods

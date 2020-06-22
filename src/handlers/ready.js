@@ -15,6 +15,22 @@ module.exports = exports = (client, config) => client.on('ready', () => {
         }, async(e, guild) => {
             if(e) throw e;
             if(!guild) return await newGuildData(g, config);
+            else {
+                /**
+                 * @type {Map}
+                 */
+                const muted = guild.features.moderation.muted;
+                muted.forEach(async (m, k) => {
+                    const member = await g.members.fetch(m.id);
+                    if((m.end-Date.now()) <= 0) {
+                        await member.roles.remove(m.roleID);
+                        muted.delete(k);
+                    } else {
+                        const remaining = m.end-Date.now();
+                        client.setTimeout(async() => await member.roles.remove(m.roleID), remaining);
+                    }
+                });
+            }
         });
     });
 

@@ -1,11 +1,12 @@
-const { Util: DiscordUtil, Client, Guild, Channel } = require('discord.js');
-const { Document } = require('mongoose');
+const { Util: DiscordUtil, Client, Guild, Channel, User, Message } = require('discord.js');
+const { Document: Docs } = require('mongoose');
 const { readdir } = require('fs');
 const Server = require('./server.js');
 const Collection = require('@discordjs/collection');
 const Filter = require('bad-words');
 const ms = require("ms");
 const GuildSettings = require("../schemas/guild.js");
+const UserData = require('../schemas/user.js');
 
 class Util extends DiscordUtil {
     /**
@@ -83,7 +84,18 @@ class Util extends DiscordUtil {
                         { action: "KICK", max: 6 },
                         { action: "BAN", max: 7 }
                     ],
-                    history: new Map()
+                    muteRole: undefined,
+                    verifiedRole: undefined,
+                    captcha: {
+                        type: "IMAGE", // REACTION,TEXT,IMAGE
+                        message: "You've been detected as a new user, please verify yourself below",
+                        charPool: ('abcdefghijklmnopqrstuvwxyz' + 'abcdefghijklmnopqrstuvwxyz'.toUpperCase() + '0123456789').split(''),
+                        reactionEmoji: "✅",
+                        text: "RANDOM"
+                    },
+                    allowFlagged: false,
+                    history: new Map(),
+                    muted: new Map()
                 },
                 greeting: {
                     welcomeChannel: undefined,
@@ -130,12 +142,79 @@ class Util extends DiscordUtil {
     }
 
     /**
+     * Generate new user data and save to DB
+     * @param {User} user 
+     */
+    static async newUserData(user) {
+        const newUser = new UserData({
+            id: user.id,
+            isBot: user.bot,
+            isFlagged: this.checkUser(user),
+            violation: [],
+            user: {
+                username: user.username,
+                discriminator: user.discriminator,
+                id: user.id,
+                createDate: user.createdAt,
+            }
+        });
+
+        try {
+            const doc = await newUser.save();
+            return doc;
+        } catch(e) {
+            if(e) throw e;
+        }
+    }
+
+    /**
+     * Flags user as suspicious or no
+     * @param {User} user 
+     */
+    static checkUser(user) {
+        const checkCreation = (Date.now() - user.createdTimestamp) >= 604800000; // 1 week
+        const hasAvatar = Boolean(user.avatarURL());
+        const hasFlags = user.flags.toArray().some(f => (f !== 'HOUSE_BALANCE' && f !== 'HOUSE_BRAVERY' && f !== 'HOUSE_BRILLIANCE'));
+        const isBot = user.bot;
+
+        return isBot ? false : (checkCreation && hasAvatar && hasFlags);
+    }
+
+    /**
      * Check if a channel is listed in special/featured channels
      * @param {Channel} channel 
-     * @param {Document} guildSettings 
+     * @param {Docs} guildSettings 
      */
     static checkChannelFeature(channel, guildSettings) {
         return guildSettings.features.imageOnlyChannels.includes(channel.id) ? "image" : "text";
+    }
+
+    /**
+     * Verify using reaction
+     * @param {String} emoji 
+     * @param {Message} message 
+     * @param {User} user
+     * @param {Number} [time=30000]
+     */
+    static async verifyReaction(emoji, message, user, time=30000) {
+        await message.react(emoji);
+        const react = await message.awaitReactions((r, u) => r.emoji.name === emoji && u.id === user.id, { time });
+        if(react.firstKey() === emoji) return true;
+        else false;
+    }
+
+    /**
+     * Verify using message
+     * @param {String} text 
+     * @param {Message} message 
+     * @param {User} user
+     * @param {Number} [time=30000]
+     */
+    static async verifyText(text, message, user, time=30000) {
+        await message.channel.send(text);
+        const txt = await message.channel.awaitMessages(m => m.content === text && m.author.id == user.id, { time });
+        if(txt.first()) return true;
+        else false;
     }
 };
 

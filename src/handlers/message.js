@@ -43,7 +43,6 @@ module.exports = exports = (client, config) => {
             }
 
             if(!c) return;
-
             if (c.permissionsRequired && message.channel.type !== "dm") {
                 if (!message.member.hasPermission(c.permissionsRequired)) return message.reply(`You don\'t have enough permissions to run that command! You need permissions \`${c.permissionsRequired}\` to run that command.`);
             }
@@ -80,6 +79,6 @@ module.exports = exports = (client, config) => {
         
             timestamps.set(message.author.id, now);
             setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-        })
+        });
     });
 }

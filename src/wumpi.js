@@ -5,6 +5,8 @@ mongoose.connect(process.env.MONGODB, {
     useUnifiedTopology: true
 }).catch(e => { if(e) throw e; }).then(() => console.log('Connected to MongoDB'));
 
+require('./mute')
+
 const { Client } = require('discord.js');
 const { initiate } = require('./lib/util.js');
 const client = new Client({ disableEveryone: true });

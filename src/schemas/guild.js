@@ -17,7 +17,18 @@ module.exports = mongoose.model('guild', new mongoose.Schema({
             whitelistDefaultWords: Array,
             useCustomFilter: Boolean,
             punishments: Array,
-            history: Map
+            muteRole: String,
+            verifiedRole: String,
+            captcha: {
+                type: String,
+                message: String,
+                charPool: Array,
+                reactionEmoji: String,
+                text: String
+            },
+            allowFlagged: Boolean,
+            history: Map,
+            muted: Map
         },
         greeting: {
             welcomeChannel: String,
