@@ -168,19 +168,6 @@ class Util extends DiscordUtil {
     }
 
     /**
-     * Flags user as suspicious or no
-     * @param {User} user 
-     */
-    static checkUser(user) {
-        const checkCreation = (Date.now() - user.createdTimestamp) >= 604800000; // 1 week
-        const hasAvatar = Boolean(user.avatarURL());
-        const hasFlags = user.flags.toArray().some(f => (f !== 'HOUSE_BALANCE' && f !== 'HOUSE_BRAVERY' && f !== 'HOUSE_BRILLIANCE'));
-        const isBot = user.bot;
-
-        return isBot ? false : (checkCreation && hasAvatar && hasFlags);
-    }
-
-    /**
      * Check if a channel is listed in special/featured channels
      * @param {Channel} channel 
      * @param {Docs} guildSettings 

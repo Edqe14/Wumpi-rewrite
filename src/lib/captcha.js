@@ -1,5 +1,4 @@
 const Canvas = require("canvas");
-const util = require('util');
 
 Canvas.registerFont(__dirname+'/fonts/Moms_typewriter.ttf', { family: "typewriter"});
 
@@ -10,57 +9,72 @@ module.exports = exports = class Captcha {
      * @param {Boolean} [options.confuse=true]
      */
     constructor(options={
-        charPool: ('abcdefghijklmnopqrstuvwxyz' + 'abcdefghijklmnopqrstuvwxyz'.toUpperCase() + '0123456789').split(''),
+        charPool: ('abcdefghijklmnopqrstuvwxyz' + 'abcdefghijklmnopqrstuvwxyz'.toUpperCase() + '23456789').split(''),
         confuse: true
     }) {
         this.pool = options.charPool;
         this.confuse = options.confuse;
     }
 
+    /**
+     * Flags user as suspicious or no
+     * @param {User} user 
+     */
+    static checkUser(user) {
+        const checkCreation = (Date.now() - user.createdTimestamp) >= 604800000; // 1 week
+        const hasAvatar = Boolean(user.avatarURL());
+        const hasFlags = user.flags.toArray().some(f => (f !== 'HOUSE_BALANCE' && f !== 'HOUSE_BRAVERY' && f !== 'HOUSE_BRILLIANCE'));
+        const isBot = user.bot;
+
+        return isBot ? false : (checkCreation && hasAvatar && hasFlags);
+    }
+
     generateRandomText(len) {
         let lenp = this.pool.length,
             res = '';
         for(let i = 0;i < len;i++) {
-            res += pool[Math.floor(Math.random() * lenp)];
+            res += this.pool[Math.floor(Math.random() * lenp)];
         }
         return res;
     }
 
-    async generateImage() {
-        const canvas = Canvas.createCanvas(370, 120);
+    generateImage() {
+        const canvas = Canvas.createCanvas(180, 57);
         const ctx = canvas.getContext('2d');
-        const len = this.pool.length;
-        const pool = this.pool;
-        const ctext = this.randomText(pool, len);
-        const text = this.randomText(pool, len);
+        const ctext = this.generateRandomText(6);
+        const text = this.generateRandomText(6);
 
         ctx.fillStyle = "#eeeeee";
-        ctx.fillRect(0, 0, 150, 32);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         if(this.confuse) {
             ctx.beginPath();
-            ctx.font = '30px Arial';
-            ctx.rotate(Math.round(Math.random() * (-.04, .02))-.05);
+            ctx.font = '34px Arial';
+            ctx.rotate(Math.round(Math.random() * (.02-(-.04)))-.05);
             ctx.strokeStyle = '#adc';
-            ctx.strokeText(ctext, Math.round(Math.random() * (20-15))+15, 26);
+            ctx.strokeText(ctext, Math.round(Math.random() * (16-14))+14, Math.round(Math.random() * (56-44))+44);
         }
 
+        let rotate = Math.round(Math.random() * (.03-(-.06)))-.06;
         ctx.beginPath();
         ctx.strokeStyle = '#0088cc';
-        ctx.font = '26px \"typewriter\"';
-        ctx.rotate(Math.round(Math.random() * (-.02, .04)));
-        ctx.strokeText(text, Math.round(Math.random() * (20-15))+15, 26);
+        ctx.font = '36px \"typewriter\"';
+        ctx.rotate(rotate);
+        ctx.strokeText(text, Math.round(Math.random() * (16-14))+14, Math.round(Math.random() * (54-42))+42);
 
-        try {
-            const toBuffer = util.promisify(canvas.toBuffer);
-            const buffer = await toBuffer();
-
-            return {
-                buffer,
-                text
-            };
-        } catch(e) {
-            if(e) throw e;
+        ctx.strokeStyle = '#0088ccc1' // '#3b5b01c1';
+        for(let i = 0; i < 5; i++) {
+            const rand = Math.floor(Math.floor(Math.random() * (16-8))+8)+rotate
+            ctx.beginPath();
+            ctx.moveTo(Math.round(Math.random() * (24-16))+16+rand, Math.round(Math.random() * (48-16))+16+rand);
+            ctx.lineTo(Math.round(Math.random() * (148-120))+120+rand, Math.round(Math.random() * (48-16))+16+rand);
+            ctx.stroke();
         }
+
+        const buffer = canvas.toBuffer();
+        return {
+            buffer,
+            text
+        };
     }
 }
